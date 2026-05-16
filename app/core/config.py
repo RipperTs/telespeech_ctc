@@ -27,7 +27,7 @@ class Settings(BaseSettings):
     max_pending_requests: int = Field(default=10, validation_alias="MAX_PENDING_REQUESTS")
 
     allowed_models: str = Field(
-        default="FunAudioLLM/SenseVoiceSmall,telespeech-ctc,whisper-1",
+        default="TeleAI/TeleSpeechASR,FunAudioLLM/SenseVoiceSmall,telespeech-ctc,whisper-1",
         validation_alias="ALLOWED_MODELS",
     )
 

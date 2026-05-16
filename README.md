@@ -26,7 +26,7 @@ curl --request POST \
   --url http://localhost:8000/v1/audio/transcriptions \
   -H "Authorization: Bearer your-api-key" \
   -F "file=@path/to/your/audio.mp3" \
-  -F "model=FunAudioLLM/SenseVoiceSmall"
+  -F "model=TeleAI/TeleSpeechASR"
 ```
 
 返回：
@@ -156,7 +156,7 @@ git push origin v1.0.0
 | `MAX_UPLOAD_MB` | `200` | 单个音频最大上传大小 |
 | `REQUEST_TIMEOUT_SECONDS` | `300` | 单次识别超时时间 |
 | `MAX_PENDING_REQUESTS` | `10` | 最多允许等待的转写请求数 |
-| `ALLOWED_MODELS` | `FunAudioLLM/SenseVoiceSmall,telespeech-ctc,whisper-1` | 接口允许的 model 参数 |
+| `ALLOWED_MODELS` | `TeleAI/TeleSpeechASR,FunAudioLLM/SenseVoiceSmall,telespeech-ctc,whisper-1` | 接口允许的 model 参数 |
 
 ## 说明
 
