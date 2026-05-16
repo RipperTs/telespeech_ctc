@@ -5,6 +5,7 @@ from fastapi import FastAPI
 from app.api.v1.router import api_router
 from app.core.config import get_settings
 from app.services.asr import AsrService
+from app.services.limiter import RequestLimiter
 
 
 @asynccontextmanager
@@ -13,6 +14,7 @@ async def lifespan(app: FastAPI):
     asr_service = AsrService(settings)
     asr_service.load()
     app.state.asr_service = asr_service
+    app.state.request_limiter = RequestLimiter(settings.max_active_requests)
 
     try:
         yield

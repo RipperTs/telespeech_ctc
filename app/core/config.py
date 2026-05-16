@@ -24,6 +24,7 @@ class Settings(BaseSettings):
     recognizer_instances: int = Field(default=1, validation_alias="RECOGNIZER_INSTANCES")
     recognizer_threads: int = Field(default=2, validation_alias="RECOGNIZER_THREADS")
     inference_workers: int = Field(default=2, validation_alias="INFERENCE_WORKERS")
+    max_pending_requests: int = Field(default=10, validation_alias="MAX_PENDING_REQUESTS")
 
     allowed_models: str = Field(
         default="FunAudioLLM/SenseVoiceSmall,telespeech-ctc,whisper-1",
@@ -47,6 +48,10 @@ class Settings(BaseSettings):
     @property
     def allowed_model_names(self) -> set[str]:
         return {item.strip() for item in self.allowed_models.split(",") if item.strip()}
+
+    @property
+    def max_active_requests(self) -> int:
+        return self.recognizer_instances + self.max_pending_requests
 
 
 @lru_cache

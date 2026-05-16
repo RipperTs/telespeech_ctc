@@ -4,11 +4,12 @@ from tempfile import TemporaryDirectory
 
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, status
 
-from app.api.dependencies import AsrServiceDep
+from app.api.dependencies import AsrServiceDep, RequestLimiterDep
 from app.core.config import Settings, get_settings
 from app.core.security import verify_api_key
 from app.schemas.transcription import TranscriptionResponse
 from app.services.asr import TranscriptionResult
+from app.services.limiter import RequestLimitExceeded
 from app.services.audio import (
     AudioProcessingError,
     AudioTooLargeError,
@@ -27,6 +28,7 @@ router = APIRouter(tags=["audio"])
 )
 async def create_transcription(
     asr_service: AsrServiceDep,
+    request_limiter: RequestLimiterDep,
     file: UploadFile = File(...),
     model: str = Form(...),
     language: str | None = Form(default=None),
@@ -52,10 +54,19 @@ async def create_transcription(
         )
 
     try:
-        result = await asyncio.wait_for(
-            _transcribe_upload(file, asr_service, settings),
-            timeout=settings.request_timeout_seconds,
-        )
+        await request_limiter.acquire()
+        try:
+            result = await asyncio.wait_for(
+                _transcribe_upload(file, asr_service, settings),
+                timeout=settings.request_timeout_seconds,
+            )
+        finally:
+            request_limiter.release()
+    except RequestLimitExceeded as exc:
+        raise HTTPException(
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+            detail="Too many pending transcription requests",
+        ) from exc
     except TimeoutError as exc:
         raise HTTPException(
             status_code=status.HTTP_504_GATEWAY_TIMEOUT,
