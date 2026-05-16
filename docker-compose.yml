@@ -1,0 +1,14 @@
+services:
+  telespeech-api:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      ASR_API_KEY: "${ASR_API_KEY:-}"
+      MODEL_DIR: "/models/telespeech"
+      RECOGNIZER_INSTANCES: "${RECOGNIZER_INSTANCES:-1}"
+      RECOGNIZER_THREADS: "${RECOGNIZER_THREADS:-2}"
+      INFERENCE_WORKERS: "${INFERENCE_WORKERS:-2}"
+    volumes:
+      - ./models/telespeech:/models/telespeech:ro
+    restart: unless-stopped

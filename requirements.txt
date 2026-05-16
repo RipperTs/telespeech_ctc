@@ -1,0 +1,6 @@
+fastapi==0.115.12
+uvicorn[standard]==0.34.2
+python-multipart==0.0.20
+pydantic-settings==2.9.1
+numpy==2.2.5
+sherpa-onnx==1.13.2
