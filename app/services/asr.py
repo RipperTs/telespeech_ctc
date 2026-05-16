@@ -7,6 +7,7 @@ from queue import Queue
 import numpy as np
 
 from app.core.config import Settings
+from app.services.punctuation import PunctuationService
 
 
 @dataclass(frozen=True)
@@ -36,8 +37,9 @@ class RecognizerPool:
 class AsrService:
     """Thread-friendly wrapper around sherpa-onnx offline recognizers."""
 
-    def __init__(self, settings: Settings) -> None:
+    def __init__(self, settings: Settings, punctuation_service: PunctuationService) -> None:
         self._settings = settings
+        self._punctuation_service = punctuation_service
         self._pool: RecognizerPool | None = None
         self._executor: ThreadPoolExecutor | None = None
 
@@ -90,7 +92,10 @@ class AsrService:
     def _transcribe_chunks(self, samples: np.ndarray, sample_rate: int) -> TranscriptionResult:
         chunk_size = self._settings.chunk_seconds * sample_rate
         if chunk_size <= 0 or len(samples) <= chunk_size:
-            return self._pool.transcribe(samples, sample_rate)
+            result = self._pool.transcribe(samples, sample_rate)
+            return TranscriptionResult(
+                text=self._punctuation_service.add_punctuation(result.text)
+            )
 
         texts: list[str] = []
         for start in range(0, len(samples), chunk_size):
@@ -102,4 +107,4 @@ class AsrService:
             if text:
                 texts.append(text)
 
-        return TranscriptionResult(text="".join(texts))
+        return TranscriptionResult(text=self._punctuation_service.add_punctuation("".join(texts)))

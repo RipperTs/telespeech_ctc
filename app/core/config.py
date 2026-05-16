@@ -16,6 +16,15 @@ class Settings(BaseSettings):
     tokens_file: str = Field(default="tokens.txt", validation_alias="TOKENS_FILE")
     model_type: str = Field(default="telespeech_ctc", validation_alias="MODEL_TYPE")
     model_provider: str = Field(default="cpu", validation_alias="MODEL_PROVIDER")
+    punctuation_model_dir: Path = Field(
+        default=Path("/models/punctuation"),
+        validation_alias="PUNCTUATION_MODEL_DIR",
+    )
+    punctuation_model_file: str = Field(
+        default="model.int8.onnx",
+        validation_alias="PUNCTUATION_MODEL_FILE",
+    )
+    enable_punctuation: bool = Field(default=True, validation_alias="ENABLE_PUNCTUATION")
 
     sample_rate: int = Field(default=16000, validation_alias="SAMPLE_RATE")
     chunk_seconds: int = Field(default=30, validation_alias="CHUNK_SECONDS")
@@ -41,6 +50,10 @@ class Settings(BaseSettings):
     @property
     def tokens_path(self) -> Path:
         return self.model_dir / self.tokens_file
+
+    @property
+    def punctuation_model_path(self) -> Path:
+        return self.punctuation_model_dir / self.punctuation_model_file
 
     @property
     def max_upload_bytes(self) -> int:

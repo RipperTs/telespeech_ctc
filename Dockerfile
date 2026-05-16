@@ -52,6 +52,21 @@ RUN set -eux; \
     cp "/tmp/model/${model_name}/tokens.txt" /models/telespeech/tokens.txt; \
     rm -rf /tmp/model
 
+RUN set -eux; \
+    if [ "${RUNTIME}" = "gpu" ]; then \
+      punct_name="sherpa-onnx-punct-ct-transformer-zh-en-vocab272727-2024-04-12"; \
+      punct_file="model.onnx"; \
+    else \
+      punct_name="sherpa-onnx-punct-ct-transformer-zh-en-vocab272727-2024-04-12-int8"; \
+      punct_file="model.int8.onnx"; \
+    fi; \
+    mkdir -p /models/punctuation /tmp/punctuation; \
+    curl -L "https://github.com/k2-fsa/sherpa-onnx/releases/download/punctuation-models/${punct_name}.tar.bz2" \
+      -o /tmp/punctuation/model.tar.bz2; \
+    tar -xjf /tmp/punctuation/model.tar.bz2 -C /tmp/punctuation; \
+    cp "/tmp/punctuation/${punct_name}/${punct_file}" "/models/punctuation/${punct_file}"; \
+    rm -rf /tmp/punctuation
+
 COPY app ./app
 
 RUN mkdir -p /app \
@@ -62,12 +77,16 @@ RUN mkdir -p /app \
     fi; \
     if [ "${RUNTIME}" = "gpu" ]; then \
       echo "MODEL_PROVIDER=cuda" >> /app/image.env; \
+      echo "PUNCTUATION_MODEL_FILE=model.onnx" >> /app/image.env; \
     else \
       echo "MODEL_PROVIDER=cpu" >> /app/image.env; \
+      echo "PUNCTUATION_MODEL_FILE=model.int8.onnx" >> /app/image.env; \
     fi
 
 ENV ENCODER_FILE=model.onnx \
-    MODEL_PROVIDER=cpu
+    MODEL_PROVIDER=cpu \
+    PUNCTUATION_MODEL_FILE=model.int8.onnx \
+    ENABLE_PUNCTUATION=true
 
 EXPOSE 8000
 

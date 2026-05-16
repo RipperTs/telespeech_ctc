@@ -3,6 +3,7 @@ set -euo pipefail
 
 VARIANT="${1:-float32}"
 TARGET_DIR="${2:-models/telespeech}"
+PUNCTUATION_DIR="${3:-models/punctuation}"
 
 case "${VARIANT}" in
   float32)
@@ -44,3 +45,29 @@ cp "${TMP_DIR}/${MODEL_NAME}/${MODEL_FILE}" "${TARGET_DIR}/${MODEL_FILE}"
 cp "${TMP_DIR}/${MODEL_NAME}/tokens.txt" "${TARGET_DIR}/tokens.txt"
 
 echo "${VARIANT} model is ready in ${TARGET_DIR}"
+
+PUNCTUATION_NAME="sherpa-onnx-punct-ct-transformer-zh-en-vocab272727-2024-04-12"
+PUNCTUATION_FILE="model.onnx"
+
+if [[ "${VARIANT}" = "int8" ]]; then
+  PUNCTUATION_NAME="${PUNCTUATION_NAME}-int8"
+  PUNCTUATION_FILE="model.int8.onnx"
+fi
+
+PUNCTUATION_URL="https://github.com/k2-fsa/sherpa-onnx/releases/download/punctuation-models/${PUNCTUATION_NAME}.tar.bz2"
+mkdir -p "${PUNCTUATION_DIR}"
+
+if [[ -f "${PUNCTUATION_DIR}/${PUNCTUATION_FILE}" ]]; then
+  echo "${VARIANT} punctuation model already exists in ${PUNCTUATION_DIR}"
+  exit 0
+fi
+
+echo "Downloading ${PUNCTUATION_NAME}..."
+curl -L "${PUNCTUATION_URL}" -o "${TMP_DIR}/${PUNCTUATION_NAME}.tar.bz2"
+
+echo "Extracting punctuation model..."
+tar -xjf "${TMP_DIR}/${PUNCTUATION_NAME}.tar.bz2" -C "${TMP_DIR}"
+
+cp "${TMP_DIR}/${PUNCTUATION_NAME}/${PUNCTUATION_FILE}" "${PUNCTUATION_DIR}/${PUNCTUATION_FILE}"
+
+echo "${VARIANT} punctuation model is ready in ${PUNCTUATION_DIR}"

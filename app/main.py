@@ -6,12 +6,16 @@ from app.api.v1.router import api_router
 from app.core.config import get_settings
 from app.services.asr import AsrService
 from app.services.limiter import RequestLimiter
+from app.services.punctuation import PunctuationService
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     settings = get_settings()
-    asr_service = AsrService(settings)
+    punctuation_service = PunctuationService(settings)
+    punctuation_service.load()
+
+    asr_service = AsrService(settings, punctuation_service)
     asr_service.load()
     app.state.asr_service = asr_service
     app.state.request_limiter = RequestLimiter(settings.max_active_requests)

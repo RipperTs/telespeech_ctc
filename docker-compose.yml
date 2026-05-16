@@ -10,5 +10,6 @@ services:
       INFERENCE_WORKERS: "${INFERENCE_WORKERS:-2}"
       MAX_PENDING_REQUESTS: "${MAX_PENDING_REQUESTS:-10}"
       CHUNK_SECONDS: "${CHUNK_SECONDS:-30}"
+      ENABLE_PUNCTUATION: "${ENABLE_PUNCTUATION:-true}"
     gpus: all
     restart: unless-stopped

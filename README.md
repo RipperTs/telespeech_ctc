@@ -13,11 +13,11 @@ registry.cn-hangzhou.aliyuncs.com/ripper/telespeech-ctc
 | Tag | 模型 | 运行环境 | 说明 |
 | --- | --- | --- | --- |
 | `latest` | float32 | GPU | 默认版本，等同 `float32-gpu` |
-| `float32-gpu` | float32 | GPU, CUDA 12.8 + CUDNN9 | 精度优先 |
-| `int8-gpu` | int8 | GPU, CUDA 12.8 + CUDNN9 | 体积和速度优先 |
-| `int8-cpu` | int8 | CPU | 无 GPU 环境使用 |
+| `float32-gpu` | float32 | GPU, CUDA 12.8 + CUDNN9 | ASR float32，标点 float32 |
+| `int8-gpu` | int8 | GPU, CUDA 12.8 + CUDNN9 | ASR int8，标点 float32 |
+| `int8-cpu` | int8 | CPU | ASR int8，标点 int8 |
 
-模型在构建镜像时已经打包到 `/models/telespeech`，运行时不需要再次下载。
+ASR 模型在构建镜像时已经打包到 `/models/telespeech`，标点模型打包到 `/models/punctuation`，运行时不需要再次下载。
 
 ## 接口
 
@@ -143,6 +143,7 @@ git push origin v1.0.0
 - `INFERENCE_WORKERS=2`：推理线程池大小
 - `MAX_PENDING_REQUESTS=10`：允许等待的请求数，超过后返回 429
 - `CHUNK_SECONDS=30`：长音频内部切片秒数，避免整段推理内存过高
+- `ENABLE_PUNCTUATION=true`：启用标点恢复
 
 建议从默认值开始压测。GPU 版本优先增加 `RECOGNIZER_INSTANCES` 前，需要关注显存占用。
 
@@ -154,6 +155,9 @@ git push origin v1.0.0
 | `MODEL_DIR` | `/models/telespeech` | 模型目录 |
 | `ENCODER_FILE` | 镜像内置 | `model.onnx` 或 `model.int8.onnx` |
 | `MODEL_PROVIDER` | 镜像内置 | `cuda` 或 `cpu` |
+| `ENABLE_PUNCTUATION` | `true` | 是否启用标点恢复 |
+| `PUNCTUATION_MODEL_DIR` | `/models/punctuation` | 标点模型目录 |
+| `PUNCTUATION_MODEL_FILE` | 镜像内置 | GPU 为 `model.onnx`，CPU 为 `model.int8.onnx` |
 | `CHUNK_SECONDS` | `30` | 长音频内部切片秒数 |
 | `MAX_UPLOAD_MB` | `200` | 单个音频最大上传大小 |
 | `REQUEST_TIMEOUT_SECONDS` | `300` | 单次识别超时时间 |
