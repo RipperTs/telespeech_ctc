@@ -9,5 +9,6 @@ services:
       RECOGNIZER_THREADS: "${RECOGNIZER_THREADS:-2}"
       INFERENCE_WORKERS: "${INFERENCE_WORKERS:-2}"
       MAX_PENDING_REQUESTS: "${MAX_PENDING_REQUESTS:-10}"
+      CHUNK_SECONDS: "${CHUNK_SECONDS:-30}"
     gpus: all
     restart: unless-stopped

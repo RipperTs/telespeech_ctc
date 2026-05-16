@@ -142,6 +142,7 @@ git push origin v1.0.0
 - `RECOGNIZER_THREADS=2`：单个模型实例的 ONNX 推理线程数
 - `INFERENCE_WORKERS=2`：推理线程池大小
 - `MAX_PENDING_REQUESTS=10`：允许等待的请求数，超过后返回 429
+- `CHUNK_SECONDS=30`：长音频内部切片秒数，避免整段推理内存过高
 
 建议从默认值开始压测。GPU 版本优先增加 `RECOGNIZER_INSTANCES` 前，需要关注显存占用。
 
@@ -153,6 +154,7 @@ git push origin v1.0.0
 | `MODEL_DIR` | `/models/telespeech` | 模型目录 |
 | `ENCODER_FILE` | 镜像内置 | `model.onnx` 或 `model.int8.onnx` |
 | `MODEL_PROVIDER` | 镜像内置 | `cuda` 或 `cpu` |
+| `CHUNK_SECONDS` | `30` | 长音频内部切片秒数 |
 | `MAX_UPLOAD_MB` | `200` | 单个音频最大上传大小 |
 | `REQUEST_TIMEOUT_SECONDS` | `300` | 单次识别超时时间 |
 | `MAX_PENDING_REQUESTS` | `10` | 最多允许等待的转写请求数 |

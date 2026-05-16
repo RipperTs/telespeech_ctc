@@ -18,6 +18,7 @@ class Settings(BaseSettings):
     model_provider: str = Field(default="cpu", validation_alias="MODEL_PROVIDER")
 
     sample_rate: int = Field(default=16000, validation_alias="SAMPLE_RATE")
+    chunk_seconds: int = Field(default=30, validation_alias="CHUNK_SECONDS")
     max_upload_mb: int = Field(default=200, validation_alias="MAX_UPLOAD_MB")
     request_timeout_seconds: int = Field(default=300, validation_alias="REQUEST_TIMEOUT_SECONDS")
 

@@ -4,6 +4,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from queue import Queue
 
+import numpy as np
+
 from app.core.config import Settings
 
 
@@ -66,7 +68,7 @@ class AsrService:
         loop = asyncio.get_running_loop()
         return await loop.run_in_executor(
             self._executor,
-            self._pool.transcribe,
+            self._transcribe_chunks,
             samples,
             sample_rate,
         )
@@ -84,3 +86,20 @@ class AsrService:
         if missing_paths:
             missing = ", ".join(str(path) for path in missing_paths)
             raise FileNotFoundError(f"Missing model file(s): {missing}")
+
+    def _transcribe_chunks(self, samples: np.ndarray, sample_rate: int) -> TranscriptionResult:
+        chunk_size = self._settings.chunk_seconds * sample_rate
+        if chunk_size <= 0 or len(samples) <= chunk_size:
+            return self._pool.transcribe(samples, sample_rate)
+
+        texts: list[str] = []
+        for start in range(0, len(samples), chunk_size):
+            chunk = samples[start : start + chunk_size]
+            if chunk.size == 0:
+                continue
+
+            text = self._pool.transcribe(chunk, sample_rate).text
+            if text:
+                texts.append(text)
+
+        return TranscriptionResult(text="".join(texts))
