@@ -165,6 +165,7 @@ git push origin v1.0.0
 | `VAD_THRESHOLD` | `0.2` | VAD 语音检测阈值 |
 | `VAD_MIN_SILENCE_SECONDS` | `0.25` | 静音切段阈值 |
 | `VAD_MIN_SPEECH_SECONDS` | `0.25` | 最短语音段阈值 |
+| `MIN_SEGMENT_SECONDS` | `1.0` | 小于该时长的片段不会送入 ASR |
 | `CHUNK_SECONDS` | `30` | 长音频内部切片秒数 |
 | `MAX_UPLOAD_MB` | `200` | 单个音频最大上传大小 |
 | `REQUEST_TIMEOUT_SECONDS` | `300` | 单次识别超时时间 |

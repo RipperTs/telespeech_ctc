@@ -37,6 +37,7 @@ class Settings(BaseSettings):
         default=0.25,
         validation_alias="VAD_MIN_SPEECH_SECONDS",
     )
+    min_segment_seconds: float = Field(default=1.0, validation_alias="MIN_SEGMENT_SECONDS")
 
     sample_rate: int = Field(default=16000, validation_alias="SAMPLE_RATE")
     chunk_seconds: int = Field(default=30, validation_alias="CHUNK_SECONDS")

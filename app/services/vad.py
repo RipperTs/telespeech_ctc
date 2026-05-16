@@ -31,7 +31,7 @@ class VadSegmenter:
         if not segments:
             return self._split_fixed(samples, sample_rate)
 
-        return segments
+        return self._filter_short_segments(segments, sample_rate)
 
     def _split_with_vad(self, samples: np.ndarray, sample_rate: int) -> list[SpeechSegment]:
         import sherpa_onnx
@@ -74,11 +74,27 @@ class VadSegmenter:
 
     def _split_fixed(self, samples: np.ndarray, sample_rate: int) -> list[SpeechSegment]:
         chunk_size = self._settings.chunk_seconds * sample_rate
+        min_samples = self._min_segment_samples(sample_rate)
+
+        if len(samples) < min_samples:
+            return []
+
         if chunk_size <= 0 or len(samples) <= chunk_size:
             return [SpeechSegment(samples=samples)] if len(samples) else []
 
         return [
             SpeechSegment(samples=samples[start : start + chunk_size])
             for start in range(0, len(samples), chunk_size)
-            if samples[start : start + chunk_size].size
+            if len(samples[start : start + chunk_size]) >= min_samples
         ]
+
+    def _filter_short_segments(
+        self,
+        segments: list[SpeechSegment],
+        sample_rate: int,
+    ) -> list[SpeechSegment]:
+        min_samples = self._min_segment_samples(sample_rate)
+        return [segment for segment in segments if len(segment.samples) >= min_samples]
+
+    def _min_segment_samples(self, sample_rate: int) -> int:
+        return max(1, int(self._settings.min_segment_seconds * sample_rate))
