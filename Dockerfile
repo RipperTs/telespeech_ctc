@@ -67,6 +67,11 @@ RUN set -eux; \
     cp "/tmp/punctuation/${punct_name}/${punct_file}" "/models/punctuation/${punct_file}"; \
     rm -rf /tmp/punctuation
 
+RUN set -eux; \
+    mkdir -p /models/vad; \
+    curl -L "https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/silero_vad.onnx" \
+      -o /models/vad/silero_vad.onnx
+
 COPY app ./app
 
 RUN mkdir -p /app \
@@ -86,7 +91,9 @@ RUN mkdir -p /app \
 ENV ENCODER_FILE=model.onnx \
     MODEL_PROVIDER=cpu \
     PUNCTUATION_MODEL_FILE=model.int8.onnx \
-    ENABLE_PUNCTUATION=true
+    ENABLE_PUNCTUATION=true \
+    VAD_MODEL_FILE=silero_vad.onnx \
+    ENABLE_VAD=true
 
 EXPOSE 8000
 

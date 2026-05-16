@@ -25,6 +25,18 @@ class Settings(BaseSettings):
         validation_alias="PUNCTUATION_MODEL_FILE",
     )
     enable_punctuation: bool = Field(default=True, validation_alias="ENABLE_PUNCTUATION")
+    vad_model_dir: Path = Field(default=Path("/models/vad"), validation_alias="VAD_MODEL_DIR")
+    vad_model_file: str = Field(default="silero_vad.onnx", validation_alias="VAD_MODEL_FILE")
+    enable_vad: bool = Field(default=True, validation_alias="ENABLE_VAD")
+    vad_threshold: float = Field(default=0.2, validation_alias="VAD_THRESHOLD")
+    vad_min_silence_seconds: float = Field(
+        default=0.25,
+        validation_alias="VAD_MIN_SILENCE_SECONDS",
+    )
+    vad_min_speech_seconds: float = Field(
+        default=0.25,
+        validation_alias="VAD_MIN_SPEECH_SECONDS",
+    )
 
     sample_rate: int = Field(default=16000, validation_alias="SAMPLE_RATE")
     chunk_seconds: int = Field(default=30, validation_alias="CHUNK_SECONDS")
@@ -54,6 +66,10 @@ class Settings(BaseSettings):
     @property
     def punctuation_model_path(self) -> Path:
         return self.punctuation_model_dir / self.punctuation_model_file
+
+    @property
+    def vad_model_path(self) -> Path:
+        return self.vad_model_dir / self.vad_model_file
 
     @property
     def max_upload_bytes(self) -> int:

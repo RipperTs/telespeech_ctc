@@ -11,5 +11,6 @@ services:
       MAX_PENDING_REQUESTS: "${MAX_PENDING_REQUESTS:-10}"
       CHUNK_SECONDS: "${CHUNK_SECONDS:-30}"
       ENABLE_PUNCTUATION: "${ENABLE_PUNCTUATION:-true}"
+      ENABLE_VAD: "${ENABLE_VAD:-true}"
     gpus: all
     restart: unless-stopped

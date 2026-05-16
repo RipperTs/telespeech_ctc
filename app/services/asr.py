@@ -8,6 +8,7 @@ import numpy as np
 
 from app.core.config import Settings
 from app.services.punctuation import PunctuationService
+from app.services.vad import VadSegmenter
 
 
 @dataclass(frozen=True)
@@ -40,6 +41,7 @@ class AsrService:
     def __init__(self, settings: Settings, punctuation_service: PunctuationService) -> None:
         self._settings = settings
         self._punctuation_service = punctuation_service
+        self._vad_segmenter = VadSegmenter(settings)
         self._pool: RecognizerPool | None = None
         self._executor: ThreadPoolExecutor | None = None
 
@@ -90,20 +92,9 @@ class AsrService:
             raise FileNotFoundError(f"Missing model file(s): {missing}")
 
     def _transcribe_chunks(self, samples: np.ndarray, sample_rate: int) -> TranscriptionResult:
-        chunk_size = self._settings.chunk_seconds * sample_rate
-        if chunk_size <= 0 or len(samples) <= chunk_size:
-            result = self._pool.transcribe(samples, sample_rate)
-            return TranscriptionResult(
-                text=self._punctuation_service.add_punctuation(result.text)
-            )
-
         texts: list[str] = []
-        for start in range(0, len(samples), chunk_size):
-            chunk = samples[start : start + chunk_size]
-            if chunk.size == 0:
-                continue
-
-            text = self._pool.transcribe(chunk, sample_rate).text
+        for segment in self._vad_segmenter.split(samples, sample_rate):
+            text = self._pool.transcribe(segment.samples, sample_rate).text
             if text:
                 texts.append(text)
 

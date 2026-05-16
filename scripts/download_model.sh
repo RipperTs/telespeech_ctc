@@ -71,3 +71,17 @@ tar -xjf "${TMP_DIR}/${PUNCTUATION_NAME}.tar.bz2" -C "${TMP_DIR}"
 cp "${TMP_DIR}/${PUNCTUATION_NAME}/${PUNCTUATION_FILE}" "${PUNCTUATION_DIR}/${PUNCTUATION_FILE}"
 
 echo "${VARIANT} punctuation model is ready in ${PUNCTUATION_DIR}"
+
+VAD_DIR="${4:-models/vad}"
+mkdir -p "${VAD_DIR}"
+
+if [[ -f "${VAD_DIR}/silero_vad.onnx" ]]; then
+  echo "VAD model already exists in ${VAD_DIR}"
+  exit 0
+fi
+
+echo "Downloading silero_vad.onnx..."
+curl -L "https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/silero_vad.onnx" \
+  -o "${VAD_DIR}/silero_vad.onnx"
+
+echo "VAD model is ready in ${VAD_DIR}"
