@@ -12,9 +12,10 @@ class Settings(BaseSettings):
     api_key: str | None = Field(default=None, validation_alias="ASR_API_KEY")
 
     model_dir: Path = Field(default=Path("/models/telespeech"), validation_alias="MODEL_DIR")
-    encoder_file: str = Field(default="model.int8.onnx", validation_alias="ENCODER_FILE")
+    encoder_file: str = Field(default="model.onnx", validation_alias="ENCODER_FILE")
     tokens_file: str = Field(default="tokens.txt", validation_alias="TOKENS_FILE")
     model_type: str = Field(default="telespeech_ctc", validation_alias="MODEL_TYPE")
+    model_provider: str = Field(default="cpu", validation_alias="MODEL_PROVIDER")
 
     sample_rate: int = Field(default=16000, validation_alias="SAMPLE_RATE")
     max_upload_mb: int = Field(default=200, validation_alias="MAX_UPLOAD_MB")

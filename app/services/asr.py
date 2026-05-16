@@ -51,7 +51,7 @@ class AsrService:
                 num_threads=self._settings.recognizer_threads,
                 sample_rate=self._settings.sample_rate,
                 decoding_method="greedy_search",
-                provider="cpu",
+                provider=self._settings.model_provider,
             )
             for _ in range(self._settings.recognizer_instances)
         ]
